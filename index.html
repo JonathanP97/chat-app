@@ -5,7 +5,7 @@
     <style>
       body { 
         font: 13px Helvetica, Arial; 
-        background-color: #ffc9dd;
+        background-color: #0c439b;
       }
 
       form { 
@@ -15,38 +15,47 @@
         width: 100%; 
       }
 
+      #chat-box {
+        background-color: #092c63;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
       #name {
-        background-color: white;
+        background-color: orange;
         opacity: 0.6;
       }
 
       #current-user{
-        display: block;
-        margin-left: 50px;
-        background-color: powderblue;
+                
       }
-      
+
       #messages { 
         list-style-type: none; 
-        padding: 0; 
-        width: 50%;
+        padding: 0;
+
       }
 
       #messages li {
         display: block; 
         padding: 10px; 
         width: 35%;
-        background-color: white;
+        margin-left: auto;
+        margin-right: auto; 
+        background-color: #a5ffab;
       }
 
       #messages li:nth-child(even) { 
-        background: pink; 
+        background: #8eeaff; 
       }
 
     </style>
   </head>
-  <body>
-    <ul id="messages"></ul>
+  <body>  
+    <div id="chat-box">
+      <ul id="messages"></ul>
+    </div>
 
     <form id="name-form" action="">
       <input id="name-input" placeholder="name please" autocomplete="off"/><button>Send</button>

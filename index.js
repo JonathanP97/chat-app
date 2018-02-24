@@ -14,10 +14,10 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('msg', function(user) {
-		var message = user.msg
-		console.log('test ====== ' +message);
-		console.log('msg: ' + user.msg);
-		io.emit('msg', user.name + ":  " + user.msg);
+		var name = user.name;
+		var message = user.msg;
+		console.log(name + ': ' + message);
+		socket.broadcast.emit('msg', name + ":  " + message);
 	});
 });
 

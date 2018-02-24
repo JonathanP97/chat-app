@@ -7,7 +7,7 @@
         font: 13px Helvetica, Arial; 
         background-color: #ffc9dd;
       }
-      
+
       form { 
         padding: 3px; 
         position: fixed; 
@@ -16,21 +16,30 @@
       }
 
       #name {
-        opacity: 0.8;
+        background-color: white;
+        opacity: 0.6;
+      }
+
+      #current-user{
+        display: block;
+        margin-left: 50px;
+        background-color: powderblue;
       }
       
       #messages { 
         list-style-type: none; 
-        margin: 0; 
         padding: 0; 
+        width: 50%;
       }
 
-      #messages li { 
-        padding: 5px 10px; 
-        width: 10%;
+      #messages li {
+        display: block; 
+        padding: 10px; 
+        width: 35%;
+        background-color: white;
       }
 
-      #messages li:nth-child(odd) { 
+      #messages li:nth-child(even) { 
         background: pink; 
       }
 
@@ -68,22 +77,20 @@
         });
 
         $('#msg-form').submit( function() {
-          user.msg = $('#msg-input').val()
-          console.log(user);
+          user.msg = $('#msg-input').val();
           socket.emit('msg', user);
           $('#msg-input').val('');
+          $('#messages').append($("<li id='current-user'>").text(user.msg));
           return false;
         });
 
         socket.on('new-user', function(u) {
-          // console.log(u)
           $('#messages').append($("<li id='name'>").text(u + " joined"));
         });
 
         socket.on('msg', function(msg) {
           $('#messages').append($('<li>').text(msg));
         });
-
       });
     </script>
   </body>

@@ -1,19 +1,29 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+const express = require('express');
+const socketIO = require('socket.io');
+const PORT = process.env.PORT || 3500;
 
-io.on('connection', function(socket) {
+const server = express()
+  .use((req, res) => res.sendFile(__dirname + '/index.html'))
+  .listen(PORT, () => console.log('Listening on port: ' + PORT));
+
+const io = socketIO(server)
+
+// var app = require('express')();
+// var http = require('http').Server(app);
+// var io = require('socket.io')(http);
+
+io.on('connection', (socket) => {
 	console.log('user connected');
 
-	socket.on('disconnect', function() {
+	socket.on('disconnect', () => {
 		console.log('user disconnected');
 	});
 
-	socket.on('new-user', function(name) {
+	socket.on('new-user', (name) => {
 		io.emit('new-user', name);
 	});
 
-	socket.on('msg', function(user) {
+	socket.on('msg', (user) => {
 		var name = user.name;
 		var message = user.msg;
 		console.log(name + ': ' + message);
@@ -21,10 +31,10 @@ io.on('connection', function(socket) {
 	});
 });
 
-app.get('/', function(req, res){
-	res.sendFile(__dirname + '/index.html');
-});
+// app.get('/', function(req, res){
+// 	res.sendFile(__dirname + '/index.html');
+// });
 
-http.listen(3500, function() {
-	console.log('On port 3500');
-});
+// http.listen(3500, function() {
+// 	console.log('On port 3500');
+// });

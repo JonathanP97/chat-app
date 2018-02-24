@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/JonathanP97/chat-app/issues"
   },
-  "homepage": "https://github.com/JonathanP97/chat-app#readme"
+  "homepage": "https://github.com/JonathanP97/chat-app#readme",
+  "engines": {
+  "node": "6.2.0"
+  },
+  "scripts": {
+  "start": "node index.js"
+  }
 }

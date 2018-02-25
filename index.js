@@ -8,10 +8,6 @@ const server = express()
 
 const io = socketIO(server)
 
-// var app = require('express')();
-// var http = require('http').Server(app);
-// var io = require('socket.io')(http);
-
 io.on('connection', (socket) => {
 	console.log('user connected');
 
@@ -30,11 +26,3 @@ io.on('connection', (socket) => {
 		socket.broadcast.emit('msg', name + ":  " + message);
 	});
 });
-
-// app.get('/', function(req, res){
-// 	res.sendFile(__dirname + '/index.html');
-// });
-
-// http.listen(3500, function() {
-// 	console.log('On port 3500');
-// });

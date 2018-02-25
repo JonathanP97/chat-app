@@ -10,17 +10,29 @@
 
       form { 
         padding: 3px; 
-        position: fixed; 
-        bottom: 0; 
         width: 100%; 
+      }
+
+      input {
+        background-color: #092c63;
+        font-weight: 720;
+        color: white;
+        border: 0;
+        border-bottom: 3px solid green;
+        padding: 8px;
+      }
+
+      button {
+        padding: 8px;
+        border: 0;
+        border-bottom: 3px solid green;
       }
 
       #chat-box {
         background-color: #092c63;
-        width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-      }
+        width: 330px;
+        margin: 50 auto 50 auto;      
+     }
 
       #name {
         background-color: orange;
@@ -34,13 +46,12 @@
       #messages { 
         list-style-type: none; 
         padding: 0;
-
       }
 
       #messages li {
         display: block; 
-        padding: 10px; 
-        width: 35%;
+        padding: 12px;
+        width: 200px;
         margin-left: auto;
         margin-right: auto; 
         background-color: #a5ffab;
@@ -58,7 +69,7 @@
     </div>
 
     <form id="name-form" action="">
-      <input id="name-input" placeholder="name please" autocomplete="off"/><button>Send</button>
+      <input id="name-input" placeholder="Name Please" autocomplete="off"/>
     </form>
 
     <form id="msg-form" action="">
@@ -83,6 +94,7 @@
           socket.emit('new-user', user.name);
           $('#name-form').remove();
           $('#msg-form').show();
+          return false;
         });
 
         $('#msg-form').submit( function() {

@@ -6,16 +6,30 @@ const server = express()
   .use((req, res) => res.sendFile(__dirname + '/index.html'))
   .listen(PORT, () => console.log('Listening on port: ' + PORT));
 
-const io = socketIO(server)
+const io = socketIO(server);
+const CURRENT_USERS = [];
+var all_users = 0;
 
 io.on('connection', (socket) => {
-	console.log('user connected');
+	io.emit('landed-on', all_users);
+	
+	socket.on('exit', (user) => {
+		console.log(user);
+	})
 
 	socket.on('disconnect', () => {
-		console.log('user disconnected');
+		console.log(CURRENT_USERS)
+		console.log(all_users);
+		io.emit('disconnect', all_users);
 	});
 
-	socket.on('new-user', (name) => {
+	socket.on('new-user', (user) => {
+		var name = user.name;
+		CURRENT_USERS.push(user);
+		all_users = CURRENT_USERS.length;
+
+		console.log(CURRENT_USERS);
+		console.log(all_users);
 		io.emit('new-user', name);
 	});
 

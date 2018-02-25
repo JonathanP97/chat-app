@@ -30,7 +30,8 @@
 
       #chat-box {
         background-color: #092c63;
-        width: 330px;
+        width: 250px;
+        padding: 5px 2px 5px 3px;
         margin: 50 auto 50 auto;      
      }
 
@@ -40,7 +41,7 @@
       }
 
       #current-user{
-                
+
       }
 
       #messages { 
@@ -48,16 +49,16 @@
         padding: 0;
       }
 
-      #messages li {
+      #messages p {
+        background-color: #a5ffab;
         display: block; 
-        padding: 12px;
+        padding: 10px;
         width: 200px;
         margin-left: auto;
         margin-right: auto; 
-        background-color: #a5ffab;
       }
 
-      #messages li:nth-child(even) { 
+      #messages p:nth-child(even) { 
         background: #8eeaff; 
       }
 
@@ -65,7 +66,7 @@
   </head>
   <body>  
     <div id="chat-box">
-      <ul id="messages"></ul>
+      <div id="messages"></div>
     </div>
 
     <form id="name-form" action="">
@@ -81,37 +82,58 @@
     <script type="text/javascript">
 
       $( function() {
-        var user = {
-          name: null,
-          msg: ''
-        }
-
         var socket = io();
+        
+        var user = {
+          id: "",
+          name: "",
+          msg: ""
+        };
+
         $('#msg-form').hide();
 
-        $('#name-form').submit( function() {
-          user.name = $('#name-input').val()
-          socket.emit('new-user', user.name);
+        $('#name-form').submit( function() {  
+          event.preventDefault();        
+          user = {
+            id: socket.id,
+            name: $('#name-input').val()
+          };
+
+          socket.emit('new-user', user);
           $('#name-form').remove();
           $('#msg-form').show();
-          return false;
         });
 
         $('#msg-form').submit( function() {
+          event.preventDefault();
           user.msg = $('#msg-input').val();
           socket.emit('msg', user);
           $('#msg-input').val('');
-          $('#messages').append($("<li id='current-user'>").text(user.msg));
-          return false;
+          $('#messages').append($("<p id='current-user'>").text(user.msg));
         });
 
+        socket.on('landed-on', function(x) {
+          console.log(x);
+        })
+
         socket.on('new-user', function(u) {
-          $('#messages').append($("<li id='name'>").text(u + " joined"));
+          $('#messages').append($("<p id='name'>").text(u + " joined"));
+        });
+
+        socket.on('disconnect', function(u) {
+          // $('#messages').append($("<p id='name'>").text(u + " joined"));
+          // console.log(socket.id);
         });
 
         socket.on('msg', function(msg) {
-          $('#messages').append($('<li>').text(msg));
+          $('#messages').append($('<p>').text(msg));
         });
+
+        window.onbeforeunload = userExit;
+        function userExit() {
+          socket.emit('exit', user);
+          socket.disconnect();
+        }
       });
     </script>
   </body>

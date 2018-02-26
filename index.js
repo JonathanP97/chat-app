@@ -6,6 +6,7 @@ const socketIO = require('socket.io');
 const PORT = process.env.PORT || 3500;
 const CURRENT_USERS = [];
 var all_users = 0;
+var myid = null;
 
 mongoose.Promise = Promise; 
 mongoose.connect(URI, (err, res) => {
@@ -14,14 +15,11 @@ mongoose.connect(URI, (err, res) => {
 		console.log('Connected to mongo');
 
 		db.User.create({
-			username: 'JonJJon',
-			name: {
-				first: "Jon",
-				last: "Plata"
-			},
-			password: 'password'
+			username: "Other",
+			name: "Last First",
+			password: "pass"
 		}).then(()=> {
-			console.log('new user created');
+			console.log('user created');
 		}).catch(err => res.json(err));
 	}
 

@@ -1,12 +1,17 @@
 const express = require('express');
+const app = express();
+app.use(express.static("public"));
+const passport = require('passport');
+require('./config/passport.js')(passport);
+const path = require('path');
 const mongoose = require('mongoose');
-const db = require('./models');
 const URI = process.env.MONGOLAB_URI || 'mongodb://localhost/chat-app';
-const socketIO = require('socket.io');
 const PORT = process.env.PORT || 3500;
+const io = require('socket.io').listen(app.listen(PORT));
 const CURRENT_USERS = [];
 var all_users = 0;
 var myid = null;
+
 
 mongoose.Promise = Promise; 
 mongoose.connect(URI, (err, res) => {
@@ -14,23 +19,11 @@ mongoose.connect(URI, (err, res) => {
 	else {
 		console.log('Connected to mongo');
 
-		db.User.create({
-			username: "Other",
-			name: "Last First",
-			password: "pass"
-		}).then(()=> {
-			console.log('user created');
-		}).catch(err => res.json(err));
 	}
 
 })
 
-const server = express()
-  .use((req, res) => res.sendFile(__dirname + '/index.html'))
-  .listen(PORT, () => console.log('Listening on port: ' + PORT));
-
-const io = socketIO(server);
-
+require('./routes.js')(app, io);
 
 io.on('connection', (socket) => {
 	io.emit('landed-on', all_users);

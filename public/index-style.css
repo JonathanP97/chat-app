@@ -1,0 +1,64 @@
+      body { 
+        font: 13px Helvetica, Arial; 
+        background-color: #0c439b;
+      }
+
+      form { 
+        padding: 3px; 
+        width: 100%; 
+      }
+
+      input {
+        background-color: #092c63;
+        font-weight: 720;
+        color: white;
+        border: 0;
+        border-bottom: 3px solid green;
+        padding: 8px;
+      }
+
+      button {
+        padding: 8px;
+        border: 0;
+        border-bottom: 3px solid green;
+      }
+
+      #chat-box {
+        background-color: #092c63;
+        width: 250px;
+        padding: 5px 2px 5px 3px;
+        margin: 50 auto 50 auto;      
+     }
+
+      #name {
+        background-color: orange;
+        opacity: 0.6;
+      }
+
+      #current-user{
+
+      }
+
+      #messages { 
+        list-style-type: none; 
+        padding: 0;
+      }
+
+      #messages p {
+        background-color: #a5ffab;
+        display: block; 
+        padding: 10px;
+        width: 200px;
+        margin-left: auto;
+        margin-right: auto; 
+      }
+
+      #messages p:nth-child(even) { 
+        background: #8eeaff; 
+      }
+
+      @media only screen and (max-width: 400px) {
+        body {
+          background-color: orange;
+        }
+      }

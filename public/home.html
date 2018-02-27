@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Chat App</title>
+  </head>
+  <body>  
+    <div id="chat-box">
+      <div id="messages"></div>
+    </div>
+
+    <form id="name-form" action="">
+      <input id="name-input" placeholder="name of sender"/>
+    </form>
+
+    <form id="msg-form" action="">
+      <input id="msg-input" autocomplete="off" /><button>Send</button>
+    </form>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+
+      $( function() {
+        var socket = io();
+        
+        var user = {
+          id: "",
+          name: "",
+          msg: ""
+        };
+
+        $('#msg-form').hide();
+
+        $('#name-form').submit( function() {  
+          event.preventDefault();        
+          user = {
+            id: socket.id,
+            name: $('#name-input').val()
+          };
+          var url = '/api/users/' + user.name;
+          $.get(url, function(data, status) {
+            console.log(data[0]);
+          })          
+        });
+
+        $('#msg-form').submit( function() {
+          event.preventDefault();
+          user.msg = $('#msg-input').val();
+          socket.emit('msg', user);
+          $('#msg-input').val('');
+          $('#messages').append($("<p id='current-user'>").text(user.msg));
+        });
+
+        socket.on('landed-on', function(x) {
+          console.log(x);
+        })
+
+        socket.on('new-user', function(u) {
+          $('#messages').append($("<p id='name'>").text(u + " joined"));
+        });
+
+        socket.on('disconnect', function(u) {
+          // $('#messages').append($("<p id='name'>").text(u + " joined"));
+          // console.log(socket.id);
+        });
+
+        socket.on('msg', function(msg) {
+          $('#messages').append($('<p>').text(msg));
+        });
+
+        window.onbeforeunload = userExit;
+        function userExit() {
+          socket.emit('exit', user);
+          socket.disconnect();
+        }
+      });
+    </script>
+  </body>
+</html>

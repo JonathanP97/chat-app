@@ -2,9 +2,29 @@
 <html>
   <head>
     <title>Register</title>
+    <style>
+      body {
+        background-color: red;
+      }
+      .form-box {
+        background-color: blue;
+        margin: 20px;
+        padding: 5px;
+        width: 300px;
+      }
+      .form-box p{
+        padding: 2px;
+        margin: 0;
+        font-weight: bold;
+      }
+      .form-box div {
+        padding: 10px;
+      }
+    </style>
   </head>
   <body>  
-    <div>
+    <div id="signup-form" class="form-box">
+      <p>Register to chat</p>
       <form action="/signup" method="post">
         <div class="form-group">
           <label>Username</label>
@@ -14,11 +34,12 @@
           <label>Password</label>
           <input type="password" name="password"/>
         </div> 
-        <button type="submit">Login</button>
+        <button type="submit">Register</button>
       </form>
     </div>
     
-    <div>
+    <div id="login-form" class="form-box">
+      <p>Or just login</p>
       <form action="/login" method="post">
         <div class="form-group">
           <label>Username</label>

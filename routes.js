@@ -5,9 +5,12 @@ module.exports = function(app, passport) {
 		res.sendFile(__dirname + '/public/chat.html');
 	});
 
+	app.get('/home/', function(req, res) {
+		res.sendFile(__dirname + '/public/home.html');
+	});
+
 	app.get('/home/:user', function(req, res) {
 		res.sendFile(__dirname + '/public/home.html');
-		res.json()
 	});
 
 
@@ -46,14 +49,14 @@ module.exports = function(app, passport) {
 
 	app.post('/signup', passport.authenticate('signup', {
 		successRedirect: '/home',
-		failureRedirect: '/login',
+		failureRedirect: '/',
 		failureFlash: false,
 		session: false
 	}));
 
 	app.post('/login', passport.authenticate('login', {
 		successRedirect: '/home',
-		failureRedirect: '/login',
+		failureRedirect: '/',
 		session: false
 	}));
 }

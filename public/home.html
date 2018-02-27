@@ -28,7 +28,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
       function addUser() {
-        console.log(this.event.target.id);
         var url = '/add/' + this.event.target.id;
         $.post(url, function(data, status) {
           console.log(data);

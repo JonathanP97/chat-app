@@ -5,8 +5,9 @@ module.exports = function(app, passport) {
 		res.sendFile(__dirname + '/public/chat.html');
 	});
 
-	app.get('/home', function(req, res) {
+	app.get('/home/:user', function(req, res) {
 		res.sendFile(__dirname + '/public/home.html');
+		res.json()
 	});
 
 
@@ -24,25 +25,34 @@ module.exports = function(app, passport) {
 	});
 
 	app.get('/api/users/:user', function(req, res) {
-		var u = req.params.user
-		console.log(u)
-		db.User.find({username: u}).then(function(user) {
+		var username = req.params.user
+		db.User.find({username: {$regex : "^" + username} }).then(function(user) {
+			console.log(user);
 			res.json(user);
 		}).catch(function(err) {
 			res.json(err);
 		});
 	});
 
+	// app.post('/add/:id', function(req, res) {
+	// 	var id = req.params.id
+
+	// 	db.User.findById(id, function(err, user) {
+	// 		if(err) res.json(err);
+			
+	// 	})
+
+	// });
+
 	app.post('/signup', passport.authenticate('signup', {
-		successRedirect: '/chat',
+		successRedirect: '/home',
 		failureRedirect: '/login',
 		failureFlash: false,
 		session: false
 	}));
 
-
 	app.post('/login', passport.authenticate('login', {
-		successRedirect: '/chat',
+		successRedirect: '/home',
 		failureRedirect: '/login',
 		session: false
 	}));

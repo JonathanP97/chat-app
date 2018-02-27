@@ -1,29 +1,48 @@
 <!doctype html>
 <html>
   <head>
-    <title>Chat App</title>
+    <title>Chat Home</title>
+    <link rel="stylesheet" type="text/css" href="/home-style.css">
   </head>
-  <body>  
+  <body>    
+    <div id="search-box">
+      <form id="search-form" action="">
+        <h3>Search your friends</h3>
+        <input id="name-input" autocomplete="off"/>
+        <button type="submit">Register</button>
+      </form>
+
+      <div id="friends"></div>
+    </div>
+
     <div id="chat-box">
       <div id="messages"></div>
     </div>
 
-    <form id="name-form" action="">
-      <input id="name-input" placeholder="name of sender"/>
-    </form>
-
     <form id="msg-form" action="">
       <input id="msg-input" autocomplete="off" /><button>Send</button>
     </form>
+
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
+      function addUser() {
+        console.log(this.event.target.id);
+        var url = '/add/' + this.event.target.id;
+        $.post(url, function(data, status) {
+          console.log(data);
+        }).then( function() {
 
+        }).catch(function(err) {
+          console.log(err);
+        })
+      }
       $( function() {
         var socket = io();
         
-        var user = {
+        var results = [];
+        var current_user = {
           id: "",
           name: "",
           msg: ""
@@ -31,17 +50,37 @@
 
         $('#msg-form').hide();
 
-        $('#name-form').submit( function() {  
-          event.preventDefault();        
-          user = {
-            id: socket.id,
-            name: $('#name-input').val()
-          };
-          var url = '/api/users/' + user.name;
+        $('#search-form').submit( function() {  
+          event.preventDefault();
+          $('#friends').empty();        
+          var name = $('#name-input').val();
+          var url = '/api/users/' + name;
+          results = [];
           $.get(url, function(data, status) {
-            console.log(data[0]);
-          })          
+            console.log(data)
+            data.map(user => {
+              var user = {
+                name: user.username,
+                id: user._id
+              }
+              results.push(user);
+            })               
+          }).then( function() {
+            results.map(user => {
+              var d = $("<div id='holder'>");
+              var friendCard = $("<p class='friend'>").text(user.name);
+              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='addUser()'>").text('add');
+
+              d.append(friendCard);
+              d.append(btn)
+              $('#friends').append(d);
+            })            
+          }).catch(function(err) {
+            console.log(err);
+          });
         });
+
+
 
         $('#msg-form').submit( function() {
           event.preventDefault();

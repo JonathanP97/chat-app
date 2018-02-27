@@ -2,19 +2,16 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var MessageSchema = new Schema({
-  subject: {
-    type: String
+  type: {
+    type: String,
+    default: "message"
   },
   text: { 
-  	type: String,
-  	required: "missing msg text"
+  	type: String
   },
   dateSent: {
   	type: Date,
   	default: Date.now
-  },
-  sender: {
-    type: String
   },
   reciever: {
     type: String

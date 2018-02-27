@@ -1,16 +1,22 @@
 const express = require('express');
 const app = express();
-app.use(express.static("public"));
+const morgan = require('morgan');
 const passport = require('passport');
+const bodyParser = require('body-parser');
 require('./config/passport.js')(passport);
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static('public'));
+app.use(passport.initialize());
 const path = require('path');
 const mongoose = require('mongoose');
 const URI = process.env.MONGOLAB_URI || 'mongodb://localhost/chat-app';
-const PORT = process.env.PORT || 3500;
-const io = require('socket.io').listen(app.listen(PORT));
 const CURRENT_USERS = [];
 var all_users = 0;
-var myid = null;
+const PORT = process.env.PORT || 3500;
+const io = require('socket.io').listen(app.listen(PORT, () => {
+	console.log('On port: ' + PORT);
+}));
 
 
 mongoose.Promise = Promise; 
@@ -18,12 +24,11 @@ mongoose.connect(URI, (err, res) => {
 	if(err) console.log(err);
 	else {
 		console.log('Connected to mongo');
-
 	}
 
 })
 
-require('./routes.js')(app, io);
+require('./routes.js')(app, passport);
 
 io.on('connection', (socket) => {
 	io.emit('landed-on', all_users);

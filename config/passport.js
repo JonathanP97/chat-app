@@ -9,33 +9,27 @@ module.exports = function(passport) {
 	});
 
 	passport.deserializeUser( (id,done) => {
-		User.findById(id, (err, user) => {
+		User.findById(id, (err, user) => { 
 			done(err, user);
 		})
 	});
 
-	passport.use(new LocalStrategy({
+	passport.use('signup', new LocalStrategy ({
 		usernameField: 'username',
 		passwordField: 'password',
 		passReqToCallback: true
 	},
 	(req, username, password, done) => {
-		// proccess.nextTick(function() {
 
 		User.findOne({ 'username': username }, (err, user) => {
 			if(err) return done(err);
 
 			if(user) {
-				return done(null, false, console.log('Username taken'));
+				return done(null, false, console.log('Username Taken'));
 			} else {
-				// console.log(req);
 				var newUser = new User();
 				newUser.username = username;
 				newUser.password = newUser.generateHash(password);
-
-				// newUser.create({username: username, password: password}, (err,data) =>{
-				// 	if(err) console.log(err);
-				// }); 
 
 				newUser.save(err => {
 					if(err) throw err;
@@ -44,8 +38,25 @@ module.exports = function(passport) {
 				});
 			}
 		});
-
-		// });
 	}
 	));	
+
+	passport.use('login', new LocalStrategy ({
+		usernameField: 'username',
+		passwordField: 'password',
+		passReqToCallback: true
+	}, 
+	(req, username, password, done) => {
+		User.findOne({'username': username}, (err, user) => {
+			if(err) return done(err);
+
+			if(!user) return done(null, false, console.log('No user found'));
+
+			if(!user.validPassword(password)) 
+				return done(null, false, console.log('Wrong password'));
+
+			return done(null, user);
+		});
+	}
+	));
 }

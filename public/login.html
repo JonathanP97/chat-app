@@ -1,76 +1,38 @@
 <!doctype html>
 <html>
   <head>
-    <title>Login to Chat</title>
-    <style>
-
-    </style>
+    <title>Register</title>
   </head>
   <body>  
-
-    <form id="name-form" action="">
-      <input id="username-input" placeholder="username" autocomplete="off"/>
-      <input id="password-input" placeholder="password" autocomplete="off"/>
-    </form>
+    <div>
+      <form action="/signup" method="post">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username"/>
+        </div> 
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password"/>
+        </div> 
+        <button type="submit">Login</button>
+      </form>
+    </div>
     
-    <script src="/socket.io/socket.io.js"></script>
+    <div>
+      <form action="/login" method="post">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username"/>
+        </div> 
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password"/>
+        </div> 
+        <button type="submit">Login</button>
+      </form>
+    </div>
+    
+    
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script type="text/javascript">
-
-      $( function() {
-        var socket = io();
-        
-        var user = {
-          id: "",
-          name: "",
-          msg: ""
-        };
-
-        $('#msg-form').hide();
-
-        $('#name-form').submit( function() {  
-          event.preventDefault();        
-          user = {
-            id: socket.id,
-            name: $('#name-input').val()
-          };
-
-          socket.emit('new-user', user);
-          $('#name-form').remove();
-          $('#msg-form').show();
-        });
-
-        $('#msg-form').submit( function() {
-          event.preventDefault();
-          user.msg = $('#msg-input').val();
-          socket.emit('msg', user);
-          $('#msg-input').val('');
-          $('#messages').append($("<p id='current-user'>").text(user.msg));
-        });
-
-        socket.on('landed-on', function(x) {
-          console.log(x);
-        })
-
-        socket.on('new-user', function(u) {
-          $('#messages').append($("<p id='name'>").text(u + " joined"));
-        });
-
-        socket.on('disconnect', function(u) {
-          // $('#messages').append($("<p id='name'>").text(u + " joined"));
-          // console.log(socket.id);
-        });
-
-        socket.on('msg', function(msg) {
-          $('#messages').append($('<p>').text(msg));
-        });
-
-        window.onbeforeunload = userExit;
-        function userExit() {
-          socket.emit('exit', user);
-          socket.disconnect();
-        }
-      });
-    </script>
   </body>
 </html>

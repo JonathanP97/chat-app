@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var bcrypt = require('bcrypt-nodejs');
 
 var UserSchema = new Schema({
   username: { 
   	type: String,
-  	trim: true,
   	required: "user needs username"
   },
   name: {
@@ -28,6 +28,13 @@ var UserSchema = new Schema({
   }]
 });
 
+UserSchema.methods.generateHash = function(pass) {
+  return bcrypt.hashSync(pass, bcrypt.genSaltSync(8), null);
+}
+
+UserSchema.methods.validPassword = function(pass) {
+  return bcrypt.compareSync(pass, this.password);
+}
 
 var User = mongoose.model("User", UserSchema);
 module.exports = User;

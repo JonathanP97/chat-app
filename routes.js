@@ -50,13 +50,10 @@ module.exports = function(app, passport) {
 	app.post('/signup', passport.authenticate('signup', {
 		successRedirect: '/home',
 		failureRedirect: '/',
-		failureFlash: false,
-		session: false
 	}));
 
 	app.post('/login', passport.authenticate('login', {
 		successRedirect: '/home',
-		failureRedirect: '/',
-		session: false
+		failureRedirect: '/'
 	}));
 }

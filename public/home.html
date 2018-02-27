@@ -37,16 +37,21 @@
           console.log(err);
         })
       }
+
       $( function() {
         var socket = io();
         
         var results = [];
         var current_user = {
           id: "",
-          name: "",
-          msg: ""
+          name: ""
         };
 
+        socket.on('connect', () => {
+          console.log(socket.id); // 'G5p5...'
+        });
+        
+        
         $('#msg-form').hide();
 
         $('#search-form').submit( function() {  
@@ -55,6 +60,7 @@
           var name = $('#name-input').val();
           var url = '/api/users/' + name;
           results = [];
+          socket.emit('event', socket);
           $.get(url, function(data, status) {
             console.log(data)
             data.map(user => {
@@ -73,6 +79,7 @@
               d.append(friendCard);
               d.append(btn)
               $('#friends').append(d);
+
             })            
           }).catch(function(err) {
             console.log(err);
@@ -95,6 +102,7 @@
 
         socket.on('new-user', function(u) {
           $('#messages').append($("<p id='name'>").text(u + " joined"));
+
         });
 
         socket.on('disconnect', function(u) {

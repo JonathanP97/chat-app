@@ -1,19 +1,42 @@
 const db = require('./models');
 
 module.exports = function(app, passport, io) {
-	io.use((socket, next) => {
-	  let handshake = socket.handshake;
-	  console.log(handshake);
-	  // find out how to handle data/cookies
-	  // sessions, add io.use in passport.js?
-	  console.log(socket.id);
+	
+	// io.use((socket, next) => {		
+	//   let handshake = socket.handshake;
+	//   console.log(handshake);
+	//   // find out how to handle data/cookies
+	//   // sessions, add io.use in passport.js?
+	//   console.log(socket.id);
+	// });
+
+
+	passport.serializeUser( (id, done) => {
+		console.log('in serialize');
+		done(null, id);
 	});
+
+	passport.deserializeUser( (id,done) => {
+		done(null, id);
+	});
+
+	function authenticationMiddleware () {  
+		return (req, res, next) => {
+			console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport)}`);
+
+		    if (req.isAuthenticated()) return next();
+		    res.redirect('/')
+		}
+	}
 
 	app.get('/chat', function(req, res) {
 		res.sendFile(__dirname + '/public/chat.html');
 	});
 
-	app.get('/home/', function(req, res) {
+	app.get('/home', authenticationMiddleware(),function(req, res) {
+		console.log('in routes ========================')
+		console.log(req.user);
+		console.log(req.isAuthenticated());
 		res.sendFile(__dirname + '/public/home.html');
 	});
 

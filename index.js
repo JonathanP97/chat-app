@@ -8,44 +8,49 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const passportSocketIo = require('passport.socketio');
 const session = require('express-session');
-const redisUrl = require('redis-url').connect(process.env.REDIS_URL);
-const RedisStore = require('connect-redis')(session);
-const sessionStore = new RedisStore({ client: redisUrl });
-require('./config/passport.js')(passport);
+// const redisUrl = require('redis-url').connect(process.env.REDIS_URL);
+// const RedisStore = require('connect-redis')(session);
+// const sessionStore = new RedisStore({ client: redisUrl });
+// require('./config/passport.js')(passport, io);
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
-app.use(session({
-	store: sessionStore,
-	resave: false,
-	saveUninitialized: false,
-	key: 'express.sid',
-	secret: 'my secret'
-}));
+// app.use(session({
+// 	store: sessionStore,
+// 	resave: false,
+// 	saveUninitialized: false,
+// 	key: 'express.sid',
+// 	secret: 'my secret'
+// }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3500;
 const URI = process.env.MONGOLAB_URI || 'mongodb://localhost/chat-app';
 const CURRENT_USERS = [];
 var all_users = 0;
 
 /// testing
-const socketio = require('socket.io');
-const http = require('http');
-const server = http.Server(app);
-var io = socketio(server);
-server.listen(3500);
-io.use(passportSocketIo.authorize({
-  key: 'express.sid',
-  secret: 'my secret',
-  store: sessionStore,
-  passport: passport,
-  cookieParser: cookieParser,
-  success: onAuthorizeSuccess,
-  fail: onAuthorizeFail
+// const socketio = require('socket.io');
+// const http = require('http');
+// const server = http.Server(app);
+// var io = socketio(server);
+// server.listen(3500);
+
+const io = require('socket.io').listen(app.listen(PORT, () => {
+	console.log('On port: ' + PORT);
 }));
+
+// io.use(passportSocketIo.authorize({
+//   key: 'express.sid',
+//   secret: 'my secret',
+//   store: sessionStore,
+//   passport: passport,
+//   cookieParser: cookieParser,
+//   success: onAuthorizeSuccess,
+//   fail: onAuthorizeFail
+// }));
 
 function onAuthorizeSuccess(data, accept) {
 	console.log('successful connection');
@@ -63,22 +68,17 @@ function onAuthorizeFail(data, message, error, accept){
 }
 
 
-// const io = require('socket.io').listen(app.listen(PORT, () => {
-// 	console.log('On port: ' + PORT);
-// }));
-
-
 mongoose.Promise = Promise; 
 mongoose.connect(URI, (err, res) => {
 	if(err) console.log(err);
 	else {
 		console.log('Connected to mongo');
-	}
+	} 
 
 })
 
-require('./routes.js')(app, passport);
-
+require('./routes.js')(app, passport, io);
+require('./config/passport.js')(passport);
 
 // io.on('connection', function(socket) {
 //   io.emit('landed-on', all_users);
@@ -95,23 +95,13 @@ require('./routes.js')(app, passport);
 
 var User = require('./models/User');
 
-// Below express-session middleware
-// Pass just the user id to the passport middleware
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-// Reading your user base ont he user.id
-passport.deserializeUser(function(id, done) {
-  User.get(id).run().then(function(user) {
-    done(null, user.public());
-  });
-});
-
-
 io.on('connection', (socket) => {
 	io.emit('landed-on', all_users);
 	
+	socket.on('landed-on', (user) => {
+		console.log('adfads');
+	});
+
 	socket.on('exit', (user) => {
 		console.log(user);
 	});

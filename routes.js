@@ -1,6 +1,14 @@
 const db = require('./models');
 
-module.exports = function(app, passport) {
+module.exports = function(app, passport, io) {
+	io.use((socket, next) => {
+	  let handshake = socket.handshake;
+	  console.log(handshake);
+	  // find out how to handle data/cookies
+	  // sessions, add io.use in passport.js?
+	  console.log(socket.id);
+	});
+
 	app.get('/chat', function(req, res) {
 		res.sendFile(__dirname + '/public/chat.html');
 	});

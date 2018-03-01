@@ -47,9 +47,12 @@
         $('#msg-form').submit( function() {
           event.preventDefault();
           user.msg = $('#msg-input').val();
-          socket.emit('msg', user);
-          $('#msg-input').val('');
-          $('#messages').append($("<p id='current-user'>").text(user.msg));
+          
+          if(user.msg !== '') {
+            socket.emit('msg', user);
+            $('#msg-input').val('');
+            $('#messages').append($("<p id='current-user'>").text(user.msg));
+          }
         });
 
         socket.on('landed-on', function(x) {

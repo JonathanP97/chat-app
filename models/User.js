@@ -18,6 +18,7 @@ var UserSchema = new Schema({
   	type: Date,
   	default: Date.now
   },
+  friendRequests: [],
   mailbox: [{
     type: Schema.Types.ObjectId,
     ref: "Message"

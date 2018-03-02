@@ -33,7 +33,7 @@ module.exports = function(app, passport, io) {
 		res.sendFile(__dirname + '/public/chat.html');
 	});
 
-	app.get('/home', authenticationMiddleware(),function(req, res) {
+	app.get('/home', authenticationMiddleware(), function(req, res) {
 		console.log('in routes ========================')
 		console.log(req.user);
 		console.log(req.isAuthenticated());
@@ -87,4 +87,10 @@ module.exports = function(app, passport, io) {
 		successRedirect: '/home',
 		failureRedirect: '/'
 	}));
+
+	app.get('/logout', function(req, res) {
+		req.logout();
+		req.session.destroy();
+		res.redirect('/');
+	});
 }

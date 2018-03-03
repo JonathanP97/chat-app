@@ -66,7 +66,8 @@ module.exports = function(app, passport, io) {
 				friends: req.user.friends,
 				friendRequests: req.user.friendRequests,
 				mail: req.user.mailbox,
-				username: req.user.username
+				username: req.user.username,
+				id: req.user._id
 			}
 			res.json(user);
 		}
@@ -83,6 +84,55 @@ module.exports = function(app, passport, io) {
 		});
 	});
 
+	// updates user friend list to add friend to friends list
+	app.post('/accept/:name', function(req, res) {
+		var name = req.params.name
+		console.log('##### in accept route #####');
+		console.log(name);
+
+		if(req.isAuthenticated() && req.user) {
+			var current_user = req.user;
+			console.log(req.user);
+			// which is better findById or standard find?
+			db.User.find({username: name}).then(function(user) {
+				console.log(user);
+
+				// user[0].friends.push(current_user);
+				// console.log(user);
+				// user[0].save(function(err) {
+				// 	if(err) console.log(err);
+				// });
+
+				// current_user.friends.push(user);
+				// current_user.save(function(err) {
+				// 	if(err) console.log(err);
+				// });
+			}).catch(function(err) {
+				res.json(err);
+			})
+
+			// db.User.findById(id, function(err, user) {
+			// 	if(err) res.json(err);
+				
+			// 	console.log(user);
+			// 	console.log('sssss');
+			// 	// user.friends.push(current_user);
+			// 	// user.save(function(err, newUser) {
+			// 	// 	if(err) console.log(err);
+
+			// 	// 	console.log(newUser);
+			// 	// });
+			// 	// current_user.friends.push(user);
+			// 	// current_user.save(function(err, newUser) {
+			// 	// 	if(err) console.log(err);
+			// 	// 	console.log(newUser);
+			// 	// });
+			// });	
+		}
+
+	});
+
+	// creates a friend request obj and pushed into added user
 	app.post('/add/:id', function(req, res) {
 		var id = req.params.id
 		console.log('$$$$$$$$$$$$$$$$$$$$ in add route $$$$$$$$$$$$')
@@ -94,7 +144,6 @@ module.exports = function(app, passport, io) {
 				text: 'Lets be friends!',
 				sender: req.user.username
 			});
-			console.log(friendReq);
 
 			db.User.findById(id, function(err, user) {
 				if(err) res.json(err);
@@ -108,7 +157,6 @@ module.exports = function(app, passport, io) {
 				});
 			})
 		}
-
 
 	});
 

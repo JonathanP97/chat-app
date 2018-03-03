@@ -11,7 +11,6 @@
     <div id="search-box">
       <h3>Search Your Friends</h3>
       <form id="search-form" action="">
-        <h3>Search your friends</h3>
         <input id="name-input" autocomplete="off"/>
         <button type="submit">Register</button>
       </form>
@@ -24,6 +23,7 @@
     </div>
 
     <div id="user_data">
+      <h3>Friends</h3>
       <div id="friends"></div>
       <h3>Friend Requests</h3>
       <div id="friend_requests"></div>
@@ -38,7 +38,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
 
-      function addUser() {
+      function sendFriendReq() {
         var url = '/add/' + this.event.target.id;
         $.post(url, function(data, status) {
           console.log(data);
@@ -46,7 +46,18 @@
 
         }).catch(function(err) {
           console.log(err);
-        })
+        });
+      }
+
+      function addFriend() {
+        var url = '/accept/' + this.event.target.id;
+        $.post(url, function(data, status) {
+          console.log(data);
+        }).then( function() {
+
+        }).catch(function(err) {
+          console.log(err);
+        });
       }
 
       // queries mongo to update client
@@ -68,20 +79,32 @@
           }
 
           // display friends
-
+          if(user.friends.length !== 0) {
+            $('#friends').empty();
+            user.friends.map(frnd => {
+              // var d = $("<div class='friend_div'>");
+              // var sender = req.reciever;
+              // sender = $("<p class='friend-sender'>").text("From: " + sender);
+              
+              // d.append(sender);
+              // d.append(btn);
+              // d.append(text);
+              
+              // $('#friend_requests').append(d);              
+            });
+          }
           // display reqs
           if(user.friendRequests.length !== 0) {
             $('#friend_requests').empty();
 
             user.friendRequests.map(req => {
-              console.log(req);
               var d = $("<div class='req_div'>");
               var sender = req.reciever;
-              sender = $("<p class='req-sender'>").text("From: " + sender);
+              var head = $("<p class='req-sender'>").text("From: " + sender);
               var text = $("<p class='req_text'>").text(req.text);
-              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='addUser()'>").text('add');
+              var btn = $("<button id='"+ sender +"' class='addFriend' onclick='addFriend()'>").text('add');
               
-              d.append(sender);
+              d.append(head);
               d.append(btn);
               d.append(text);
               

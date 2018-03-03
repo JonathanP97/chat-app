@@ -46,3 +46,35 @@ h3 {
 .addFriend {
 	margin-left: 15px;
 }
+
+#user_data {
+	background-color: #ea6c23;
+	width: 250px;
+}
+
+.req_div {
+	background-color: #ffce54;
+	padding: 2px;
+	width: 210px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 2px;
+	margin-bottom: 20px;
+}
+
+.req_div > p {
+	font-weight: 600;
+	margin: 5px;
+	width: 50%;
+	display: inline-block;
+}
+
+.req_div > button {
+	background-color: #ff9277;
+	border: 2px solid #ff6742;
+	opacity: 0.7;
+	padding: 5px;
+	float: right;
+	margin-top: 10px;
+	margin-right: 20px;
+}

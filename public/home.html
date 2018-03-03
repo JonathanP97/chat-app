@@ -4,29 +4,40 @@
     <title>Chat Home</title>
     <link rel="stylesheet" type="text/css" href="/home-style.css">
   </head>
-  <body>    
+  <body>
+    <div>
+      <h3 id="current_user"></h3>
+    </div>    
     <div id="search-box">
+      <h3>Search Your Friends</h3>
       <form id="search-form" action="">
         <h3>Search your friends</h3>
         <input id="name-input" autocomplete="off"/>
         <button type="submit">Register</button>
       </form>
 
-      <div id="friends"></div>
+      <div id="results"></div>
     </div>
 
     <div id="chat-box">
       <div id="messages"></div>
     </div>
 
-    <form id="msg-form" action="">
+    <div id="user_data">
+      <div id="friends"></div>
+      <h3>Friend Requests</h3>
+      <div id="friend_requests"></div>
+    </div>
+
+<!--     <form id="msg-form" action="">
       <input id="msg-input" autocomplete="off" /><button>Send</button>
-    </form>
-    <a href="/logout">Logout</a>
+    </form>-->
+    <a href="/logout">Logout</a> 
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
+
       function addUser() {
         var url = '/add/' + this.event.target.id;
         $.post(url, function(data, status) {
@@ -38,9 +49,54 @@
         })
       }
 
+      // queries mongo to update client
+      function getUserData() {
+        //query new friends
+        // query new messages 
+        // querry new friend requests
+        var user = null;
+        var url = '/update'; 
+
+        $.get(url, function(data, status) {
+          console.log(data);
+          user = data;
+        }).then( function() {
+          $('#current_user').text(user.username);
+          // display messages
+          if(user.mail.length !== 0) {
+
+          }
+
+          // display friends
+
+          // display reqs
+          if(user.friendRequests.length !== 0) {
+            $('#friend_requests').empty();
+
+            user.friendRequests.map(req => {
+              console.log(req);
+              var d = $("<div class='req_div'>");
+              var sender = req.reciever;
+              sender = $("<p class='req-sender'>").text("From: " + sender);
+              var text = $("<p class='req_text'>").text(req.text);
+              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='addUser()'>").text('add');
+              
+              d.append(sender);
+              d.append(btn);
+              d.append(text);
+              
+              $('#friend_requests').append(d);              
+            }); 
+          }
+        }).catch( function(err) {
+          console.log(err);
+        });
+      }
+
       $( function() {
         var socket = io();
-        
+        getUserData();
+
         var results = [];
         var current_user = {
           id: "",
@@ -48,7 +104,7 @@
         };
 
         socket.on('connect', () => {
-          console.log(socket.id); // 'G5p5...'
+          console.log(socket.id); 
         });
         
         
@@ -56,13 +112,14 @@
 
         $('#search-form').submit( function() {  
           event.preventDefault();
-          $('#friends').empty();        
+          $('#results').empty();        
           var name = $('#name-input').val();
           var url = '/api/users/' + name;
           results = [];
           socket.emit('event', socket);
           $.get(url, function(data, status) {
             console.log(data)
+            // TODO: send id & username only //
             data.map(user => {
               var user = {
                 name: user.username,
@@ -78,7 +135,7 @@
 
               d.append(friendCard);
               d.append(btn)
-              $('#friends').append(d);
+              $('#results').append(d);
 
             })            
           }).catch(function(err) {
@@ -97,7 +154,7 @@
         });
 
         socket.on('landed-on', function(x) {
-          console.log(x);
+          // console.log(x);
         })
 
         socket.on('new-user', function(u) {

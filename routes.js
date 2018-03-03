@@ -49,7 +49,7 @@ module.exports = function(app, passport, io) {
 		res.sendFile(__dirname + '/public/login.html');
 	});
 
-
+	//gets all users
 	app.get('/api/users', function(req, res) {
 		db.User.find({}).then(function(user) {
 			res.json(user);
@@ -58,6 +58,21 @@ module.exports = function(app, passport, io) {
 		});
 	});
 
+	//gets one specific user --> to update client
+	app.get('/update', function(req, res) {
+		if(req.isAuthenticated() && req.user) {
+			// var user = req.user;
+			var user = {
+				friends: req.user.friends,
+				friendRequests: req.user.friendRequests,
+				mail: req.user.mailbox,
+				username: req.user.username
+			}
+			res.json(user);
+		}
+	});
+
+	// route to search for friends
 	app.get('/api/users/:user', function(req, res) {
 		var username = req.params.user
 		db.User.find({username: {$regex : "^" + username} }).then(function(user) {
@@ -68,15 +83,34 @@ module.exports = function(app, passport, io) {
 		});
 	});
 
-	// app.post('/add/:id', function(req, res) {
-	// 	var id = req.params.id
+	app.post('/add/:id', function(req, res) {
+		var id = req.params.id
+		console.log('$$$$$$$$$$$$$$$$$$$$ in add route $$$$$$$$$$$$')
 
-	// 	db.User.findById(id, function(err, user) {
-	// 		if(err) res.json(err);
-			
-	// 	})
+		if(req.isAuthenticated() && req.user) {
+			var sender = req.user;
+			var friendReq = new db.Message({
+				type: 'friend',
+				text: 'Lets be friends!',
+				sender: req.user.username
+			});
+			console.log(friendReq);
 
-	// });
+			db.User.findById(id, function(err, user) {
+				if(err) res.json(err);
+				
+				console.log(user);
+				user.friendRequests.push(friendReq);
+				user.save(function(err, newUser) {
+					if(err) console.log(err);
+
+					console.log(newUser);
+				});
+			})
+		}
+
+
+	});
 
 	app.post('/signup', passport.authenticate('signup', {
 		successRedirect: '/home',

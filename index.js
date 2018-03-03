@@ -92,9 +92,10 @@ var User = require('./models/User');
 
 io.on('connection', (socket) => {
 	io.emit('landed-on', all_users);
+	console.log('****************in socket events*********************')
 	console.log(socket.request.user);
 	console.log(socket.request.user.logged_in)
-	console.log('*************************************')
+	
 	socket.on('landed-on', (user) => {
 
 	});

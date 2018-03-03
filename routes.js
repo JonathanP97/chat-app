@@ -90,7 +90,7 @@ module.exports = function(app, passport, io) {
 
 	app.get('/logout', function(req, res) {
 		req.logout();
-		req.session.destroy();
+		req.session = null;
 		res.redirect('/');
 	});
 }

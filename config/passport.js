@@ -12,14 +12,14 @@ module.exports = function(passport, io) {
 	//   console.log(socket.id);
 	// });
 
-	// passport.serializeUser( (id, done) => {
-	// 	console.log('in serialize');
-	// 	done(null, id);
-	// });
+	passport.serializeUser( (id, done) => {
+		console.log('in serialize');
+		done(null, id);
+	});
 
-	// passport.deserializeUser( (id,done) => {
-	// 	done(null, id);
-	// });
+	passport.deserializeUser( (id,done) => {
+		done(null, id);
+	});
 
 	passport.use('signup', new LocalStrategy ({
 		usernameField: 'username',

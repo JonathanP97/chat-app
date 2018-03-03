@@ -9,7 +9,7 @@ const passport = require('passport');
 const passportSocketIo = require('passport.socketio');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-
+const sessionStore = new MongoStore({mongooseConnection: mongoose.connection});
 const PORT = process.env.PORT || 3500;
 const URI = process.env.MONGOLAB_URI || 'mongodb://localhost/chat-app';
 
@@ -24,44 +24,35 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.use(session({
-	store: new MongoStore({mongooseConnection: mongoose.connection}),
+	store: sessionStore,
 	resave: false,
 	saveUninitialized: false,
 	key: 'express.sid',
 	secret: 'my secret',
 	// cookie: {secure: true}
+	unset: 'destroy'
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 
-
-
-
 const CURRENT_USERS = [];
 var all_users = 0;
-
-/// testing
-// const socketio = require('socket.io');
-// const http = require('http');
-// const server = http.Server(app);
-// var io = socketio(server);
-// server.listen(3500);
 
 const io = require('socket.io').listen(app.listen(PORT, () => {
 	console.log('On port: ' + PORT);
 }));
 
-// io.use(passportSocketIo.authorize({
-//   key: 'express.sid',
-//   secret: 'my secret',
-//   store: sessionStore,
-//   passport: passport,
-//   cookieParser: cookieParser,
-//   success: onAuthorizeSuccess,
-//   fail: onAuthorizeFail
-// }));
+io.use(passportSocketIo.authorize({
+  key: 'express.sid',
+  secret: 'my secret',
+  store: sessionStore,
+  passport: passport,
+  cookieParser: cookieParser,
+  success: onAuthorizeSuccess,
+  fail: onAuthorizeFail
+}));
 
 function onAuthorizeSuccess(data, accept) {
 	console.log('successful connection');
@@ -101,7 +92,9 @@ var User = require('./models/User');
 
 io.on('connection', (socket) => {
 	io.emit('landed-on', all_users);
-	
+	console.log(socket.request.user);
+	console.log(socket.request.user.logged_in)
+	console.log('*************************************')
 	socket.on('landed-on', (user) => {
 
 	});

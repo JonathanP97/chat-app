@@ -24,8 +24,7 @@ var UserSchema = new Schema({
     ref: "Message"
   }],
   friends: [{
-  	type: Schema.Types.ObjectId,
-  	ref: "User"
+    type: Array
   }]
 });
 

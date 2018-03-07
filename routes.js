@@ -92,24 +92,28 @@ module.exports = function(app, passport, io) {
 
 		if(req.isAuthenticated() && req.user) {
 			var current_user = req.user;
+			var sender = null;
 			console.log(req.user);
-			// which is better findById or standard find?
+			console.log("\n\n________________________________________");
+			// which is better findById or standard search?
+
+			// finding sender of friend request in db
 			db.User.find({username: name}).then(function(user) {
+
+				sender = user[0];
+				sender.friends.push(current_user.username);
 				console.log(user);
+				sender.save(function(err) {
+					if(err) console.log(err);
+				});
 
-				// user[0].friends.push(current_user);
-				// console.log(user);
-				// user[0].save(function(err) {
-				// 	if(err) console.log(err);
-				// });
-
-				// current_user.friends.push(user);
-				// current_user.save(function(err) {
-				// 	if(err) console.log(err);
-				// });
-			}).catch(function(err) {
+				current_user.friends.push(sender.username);
+				current_user.save(function(err) {
+					if(err) console.log(err);
+				});
+			}).catch( function(err) {
 				res.json(err);
-			})
+			});
 
 			// db.User.findById(id, function(err, user) {
 			// 	if(err) res.json(err);

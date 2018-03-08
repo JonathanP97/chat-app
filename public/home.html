@@ -30,9 +30,6 @@
       <div id="friend_requests"></div>
     </div>
 
-<!--     <form id="msg-form" action="">
-      <input id="msg-input" autocomplete="off" /><button>Send</button>
-    </form>-->
     <a href="/logout">Logout</a> 
     
     <script src="/socket.io/socket.io.js"></script>
@@ -51,14 +48,15 @@
       }
 
       function addFriend() {
+        console.log(this.event.target);
         var url = '/accept/' + this.event.target.id;
-        $.post(url, function(data, status) {
-          console.log(data);
-        }).then( function() {
+        // $.post(url, function(data, status) {
+        //   console.log(data);
+        // }).then( function() {
 
-        }).catch(function(err) {
-          console.log(err);
-        });
+        // }).catch(function(err) {
+        //   console.log(err);
+        // });
       }
 
       // queries mongo to update client
@@ -100,6 +98,7 @@
 
             user.friendRequests.map(req => {
               var d = $("<div class='req_div'>");
+              console.log(req)
               var sender = req.reciever;
               var head = $("<p class='req-sender'>").text("From: " + sender);
               var text = $("<p class='req_text'>").text(req.text);
@@ -155,7 +154,7 @@
             results.map(user => {
               var d = $("<div id='holder'>");
               var friendCard = $("<p class='friend'>").text(user.name);
-              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='addUser()'>").text('add');
+              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='sendFriendReq()'>").text('add');
 
               d.append(friendCard);
               d.append(btn)

@@ -74,6 +74,7 @@ module.exports = function(app, passport, io) {
 	});
 
 	// route to search for friends
+	// id or username??
 	app.get('/api/users/:user', function(req, res) {
 		var username = req.params.user
 		db.User.find({username: {$regex : "^" + username} }).then(function(user) {
@@ -85,6 +86,7 @@ module.exports = function(app, passport, io) {
 	});
 
 	// updates user friend list to add friend to friends list
+	// id or username
 	app.post('/accept/:name', function(req, res) {
 		var name = req.params.name
 		console.log('##### in accept route #####');
@@ -94,8 +96,7 @@ module.exports = function(app, passport, io) {
 			var current_user = req.user;
 			var sender = null;
 			console.log(req.user);
-			console.log("\n\n________________________________________");
-			// which is better findById or standard search?
+			console.log("\n\n___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\n\n");
 
 			// finding sender of friend request in db
 			db.User.find({username: name}).then(function(user) {
@@ -104,34 +105,17 @@ module.exports = function(app, passport, io) {
 				sender.friends.push(current_user.username);
 				console.log(user);
 				sender.save(function(err) {
-					if(err) console.log(err);
+					if(err) res.json(err);
 				});
 
 				current_user.friends.push(sender.username);
 				current_user.save(function(err) {
-					if(err) console.log(err);
+					if(err) res.json(err);   
 				});
 			}).catch( function(err) {
 				res.json(err);
 			});
 
-			// db.User.findById(id, function(err, user) {
-			// 	if(err) res.json(err);
-				
-			// 	console.log(user);
-			// 	console.log('sssss');
-			// 	// user.friends.push(current_user);
-			// 	// user.save(function(err, newUser) {
-			// 	// 	if(err) console.log(err);
-
-			// 	// 	console.log(newUser);
-			// 	// });
-			// 	// current_user.friends.push(user);
-			// 	// current_user.save(function(err, newUser) {
-			// 	// 	if(err) console.log(err);
-			// 	// 	console.log(newUser);
-			// 	// });
-			// });	
 		}
 
 	});
@@ -139,7 +123,7 @@ module.exports = function(app, passport, io) {
 	// creates a friend request obj and pushed into added user
 	app.post('/add/:id', function(req, res) {
 		var id = req.params.id
-		console.log('$$$$$$$$$$$$$$$$$$$$ in add route $$$$$$$$$$$$')
+		console.log('$$$$$$$$ in add route $$$$$$$$$')
 
 		if(req.isAuthenticated() && req.user) {
 			var sender = req.user;

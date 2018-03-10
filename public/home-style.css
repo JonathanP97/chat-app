@@ -43,10 +43,6 @@ h3 {
 	font-weight: bold;
 }
 
-.addFriend {
-	margin-left: 15px;
-}
-
 #user_data {
 	background-color: #ea6c23;
 	width: 250px;
@@ -62,19 +58,36 @@ h3 {
 	margin-bottom: 20px;
 }
 
-.req_div > p {
-	font-weight: 600;
-	margin: 5px;
-	width: 50%;
-	display: inline-block;
+.reqSender {
+	font-weight: 700;
+	margin: 0px 0px 10px 0px;
+}
+
+.reqText {
+	text-align: center;
+	margin: 0px 0px 4px 0px;
 }
 
 .req_div > button {
+	opacity: 0.8;
+	width: 60px;
+	font-weight: 600;
+	padding: 4px;
+	text-align: center;
+}
+.addFriend {
 	background-color: #ff9277;
 	border: 2px solid #ff6742;
-	opacity: 0.7;
-	padding: 5px;
+	margin-top: 5px;
+	margin-left: 30px;
+	margin-bottom: 5px;
+}
+
+.ignoreBtn {
+	background-color: #E3E3E3;
+	border: 2px solid #949494;	
 	float: right;
-	margin-top: 10px;
-	margin-right: 20px;
+	margin-top: 5px;
+	margin-right: 30px;
+	margin-bottom: 5px;
 }

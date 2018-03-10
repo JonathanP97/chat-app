@@ -37,8 +37,17 @@
     <script type="text/javascript">
 
       function sendFriendReq() {
-        var url = '/add/' + this.event.target.id;
-        $.post(url, function(data, status) {
+        console.log(this.event.target.name)
+        var url = '/add/' + this.event.target.name;
+        console.log(url);
+
+        var request = prompt("Add some text to your friend request", "Let's be friends!");
+        if (request == null || request == "") {
+        } else {
+          console.log(request);
+        }
+
+        $.post(url, {text: request},function(data, status) {
           console.log(data);
         }).then( function() {
 
@@ -92,22 +101,23 @@
               // $('#friend_requests').append(d);              
             });
           }
-          // display reqs
+
+          // display friend requests
           if(user.friendRequests.length !== 0) {
             $('#friend_requests').empty();
 
             user.friendRequests.map(req => {
               var d = $("<div class='req_div'>");
               console.log(req)
-              var sender = req.reciever;
-              var head = $("<p class='req-sender'>").text("From: " + sender);
-              var text = $("<p class='req_text'>").text(req.text);
-              var btn = $("<button id='"+ sender +"' class='addFriend' onclick='addFriend()'>").text('add');
-              
+              var sender = req.sender;
+              var head = $("<p class='reqSender'>").text("From: " + sender);
+              var text = $("<p class='reqText'>").text(req.text);
+              var btn = $("<button id='"+ sender +"' class='addFriend' onclick='addFriend()'>").text('Add');
+              var remove = $("<button class='ignoreBtn'>").text('Ignore');
               d.append(head);
-              d.append(btn);
               d.append(text);
-              
+              d.append(btn);
+              d.append(remove);
               $('#friend_requests').append(d);              
             }); 
           }

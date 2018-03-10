@@ -74,9 +74,9 @@ module.exports = function(app, passport, io) {
 	});
 
 	// route to search for friends
-	// id or username??
 	app.get('/api/users/:user', function(req, res) {
 		var username = req.params.user
+		//TODO INGORE CASE
 		db.User.find({username: {$regex : "^" + username} }).then(function(user) {
 			console.log(user);
 			res.json(user);
@@ -85,6 +85,7 @@ module.exports = function(app, passport, io) {
 		});
 	});
 
+	// ACCEPT FRIEND REQUESTS (not working)
 	// updates user friend list to add friend to friends list
 	// id or username
 	app.post('/accept/:name', function(req, res) {
@@ -111,7 +112,7 @@ module.exports = function(app, passport, io) {
 				current_user.friends.push(sender.username);
 				current_user.save(function(err) {
 					if(err) res.json(err);   
-				});
+				});W
 			}).catch( function(err) {
 				res.json(err);
 			});
@@ -120,30 +121,30 @@ module.exports = function(app, passport, io) {
 
 	});
 
-	// creates a friend request obj and pushed into added user
-	app.post('/add/:id', function(req, res) {
-		var id = req.params.id
-		console.log('$$$$$$$$ in add route $$$$$$$$$')
+	// ADD FRIENDS (working 3/10)
+	// updates friend request to recievers inbox
+	app.post('/add/:name', function(req, res) {
+		var reciever_username = req.params.name;
+		console.log('Reciever:', reciever_username);
+		console.log('Request Body:', req.body);
 
 		if(req.isAuthenticated() && req.user) {
 			var sender = req.user;
-			var friendReq = new db.Message({
-				type: 'friend',
-				text: 'Lets be friends!',
-				sender: req.user.username
-			});
+			console.log('sender:', sender);
+			var friendReq = {
+				text: req.body.text || 'Let\'s be friends!',
+				sender: sender.username
+			};
 
-			db.User.findById(id, function(err, user) {
+			db.User.find({username: reciever_username}, function(err, user) {
 				if(err) res.json(err);
-				
 				console.log(user);
-				user.friendRequests.push(friendReq);
-				user.save(function(err, newUser) {
+				user[0].friendRequests.push(friendReq);
+				user[0].save(function(err, newUser) {
 					if(err) console.log(err);
-
 					console.log(newUser);
 				});
-			})
+			});
 		}
 
 	});

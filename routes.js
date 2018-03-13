@@ -10,7 +10,6 @@ module.exports = function(app, passport, io) {
 	//   console.log(socket.id);
 	// });
 
-
 	passport.serializeUser( (id, done) => {
 		console.log('in serialize');
 		done(null, id);
@@ -40,8 +39,12 @@ module.exports = function(app, passport, io) {
 		res.sendFile(__dirname + '/public/home.html');
 	});
 
-	app.get('/home/:user', function(req, res) {
-		res.sendFile(__dirname + '/public/home.html');
+	app.get('/home/:user', function(req, res) {		
+		if(req.isAuthenticated() && req.user) {
+		  res.sendFile(__dirname + '/public/home.html');
+		} else {
+		  res.sendFile(__dirname + '/public/login.html');
+		}
 	});
 
 
@@ -121,9 +124,9 @@ module.exports = function(app, passport, io) {
 
 	});
 
-	// ADD FRIENDS (working 3/10)
+	// ADD FRIENDS (working 3/10/18)
 	// updates friend request to recievers inbox
-	app.post('/add/:name', function(req, res) {
+	app.post('/request/:name', function(req, res) {
 		var reciever_username = req.params.name;
 		console.log('Reciever:', reciever_username);
 		console.log('Request Body:', req.body);
@@ -146,7 +149,35 @@ module.exports = function(app, passport, io) {
 				});
 			});
 		}
+	});
 
+	app.post('/ignoreReq/:name', function(req,res) {
+		var username = req.params.name;
+
+		if(req.isAuthenticated() && req.user) {
+			var current = req.user;
+			console.log('Current User:', current.username);
+			console.log('Ignore:', username);
+			// var friendReq = {
+			// 	text: req.body.text || 'Let\'s be friends!',
+			// 	sender: sender.username
+			// };
+
+			db.User.find({username: current.username}, function(err, user) {
+				if(err) res.json(err);
+				user[0].friendRequests.map( req => {
+					console.log(req);
+					console.log(req.sender);
+					if(req.sender === username) console.log('match match match');
+				});
+
+				// user[0].friendRequests.push(friendReq);
+				// user[0].save(function(err, newUser) {
+				// 	if(err) console.log(err);
+				// 	console.log(newUser);
+				// });
+			});
+		}
 	});
 
 	app.post('/signup', passport.authenticate('signup', {

@@ -19,10 +19,6 @@
       <div id="results"></div>
     </div>
 
-    <div id="chat-box">
-      <div id="messages"></div>
-    </div>
-
     <div id="user_data">
       <h3>Friends</h3>
       <div id="friends"></div>
@@ -37,17 +33,14 @@
     <script type="text/javascript">
 
       function sendFriendReq() {
-        console.log(this.event.target.name)
-        var url = '/add/' + this.event.target.name;
+        do {
+          var request = prompt("Add some text to your friend request", "Let's be friends!");
+        } while (request == null || request == "");
+        
+        var url = '/request/' + this.event.target.name;
         console.log(url);
-
-        var request = prompt("Add some text to your friend request", "Let's be friends!");
-        if (request == null || request == "") {
-        } else {
-          console.log(request);
-        }
-
-        $.post(url, {text: request},function(data, status) {
+        
+        $.post(url, {text: request},function(data) {
           console.log(data);
         }).then( function() {
 
@@ -68,11 +61,43 @@
         // });
       }
 
+      function ignoreRequest() {
+        console.log(this.event.target.name);
+        var url = '/ignoreReq/' + this.event.target.name;
+        $.post(url, function(data) {
+          console.log(data);
+        }).then(function() {
+
+        }).catch(function(err) {
+
+        });
+      }
+
+      function reloadFriends(friends) {
+        // console.log(friends);
+      }
+
+      function reloadFriendRequests(requests) {
+        console.log(requests);
+
+        requests.map(req => {
+          var d = $("<div class='req_div'>");
+          var sender = req.sender;
+          var head = $("<p class='reqSender'>").text("From: " + sender);
+          var text = $("<p class='reqText'>").text(req.text);
+          var btn = $("<button id='"+ sender +"' class='addFriend' onclick='addFriend()'>").text('Add');
+          var remove = $("<button name='"+ sender +"' class='ignoreBtn' onclick='ignoreRequest()'>").text('Ignore');
+
+          d.append(head);
+          d.append(text);
+          d.append(btn);
+          d.append(remove);
+          $('#friend_requests').append(d);              
+        }); 
+      }
+
       // queries mongo to update client
       function getUserData() {
-        //query new friends
-        // query new messages 
-        // querry new friend requests
         var user = null;
         var url = '/update'; 
 
@@ -81,6 +106,7 @@
           user = data;
         }).then( function() {
           $('#current_user').text(user.username);
+
           // display messages
           if(user.mail.length !== 0) {
 
@@ -89,41 +115,19 @@
           // display friends
           if(user.friends.length !== 0) {
             $('#friends').empty();
-            user.friends.map(frnd => {
-              // var d = $("<div class='friend_div'>");
-              // var sender = req.reciever;
-              // sender = $("<p class='friend-sender'>").text("From: " + sender);
-              
-              // d.append(sender);
-              // d.append(btn);
-              // d.append(text);
-              
-              // $('#friend_requests').append(d);              
-            });
+
+            // reloadFriends(####);
           }
 
           // display friend requests
-          if(user.friendRequests.length !== 0) {
+          if(user.friendRequests.length !== 0) {          
             $('#friend_requests').empty();
-
-            user.friendRequests.map(req => {
-              var d = $("<div class='req_div'>");
-              console.log(req)
-              var sender = req.sender;
-              var head = $("<p class='reqSender'>").text("From: " + sender);
-              var text = $("<p class='reqText'>").text(req.text);
-              var btn = $("<button id='"+ sender +"' class='addFriend' onclick='addFriend()'>").text('Add');
-              var remove = $("<button class='ignoreBtn'>").text('Ignore');
-              d.append(head);
-              d.append(text);
-              d.append(btn);
-              d.append(remove);
-              $('#friend_requests').append(d);              
-            }); 
+            reloadFriendRequests(user.friendRequests); 
           }
         }).catch( function(err) {
           console.log(err);
         });
+
       }
 
       $( function() {
@@ -140,9 +144,6 @@
           console.log(socket.id); 
         });
         
-        
-        $('#msg-form').hide();
-
         $('#search-form').submit( function() {  
           event.preventDefault();
           $('#results').empty();        
@@ -177,33 +178,11 @@
         });
 
 
-
-        $('#msg-form').submit( function() {
-          event.preventDefault();
-          user.msg = $('#msg-input').val();
-          socket.emit('msg', user);
-          $('#msg-input').val('');
-          $('#messages').append($("<p id='current-user'>").text(user.msg));
-        });
-
         socket.on('landed-on', function(x) {
           // console.log(x);
-        })
-
-        socket.on('new-user', function(u) {
-          $('#messages').append($("<p id='name'>").text(u + " joined"));
-
         });
 
-        socket.on('disconnect', function(u) {
-          // $('#messages').append($("<p id='name'>").text(u + " joined"));
-          // console.log(socket.id);
-        });
-
-        socket.on('msg', function(msg) {
-          $('#messages').append($('<p>').text(msg));
-        });
-
+        // check 
         window.onbeforeunload = userExit;
         function userExit() {
           socket.emit('exit', user);

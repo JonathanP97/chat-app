@@ -64,15 +64,18 @@ module.exports = function(app, passport, io) {
 	//gets one specific user --> to update client
 	app.get('/update', function(req, res) {
 		if(req.isAuthenticated() && req.user) {
-			// var user = req.user;
-			var user = {
-				friends: req.user.friends,
-				friendRequests: req.user.friendRequests,
-				mail: req.user.mailbox,
-				username: req.user.username,
-				id: req.user._id
-			}
-			res.json(user);
+			db.User.find({username: req.user.username}).then(function(user) {
+				var newUser = {
+				  friends: req.user.friends,
+				  friendRequests: req.user.friendRequests,
+				  mail: req.user.mailbox,
+				  username: req.user.username,
+				  id: req.user._id
+				}
+				res.json(newUser);
+			}).catch(function(err) {
+				res.json(err);
+			});
 		}
 	});
 

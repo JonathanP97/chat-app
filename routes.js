@@ -156,7 +156,8 @@ module.exports = function(app, passport, io) {
 
 		if(req.isAuthenticated() && req.user) {
 			var current = req.user;
-			console.log('Current User:', current.username);
+
+			console.log('\nCurrent User:', current.username);
 			console.log('Ignore:', username);
 			// var friendReq = {
 			// 	text: req.body.text || 'Let\'s be friends!',
@@ -165,17 +166,30 @@ module.exports = function(app, passport, io) {
 
 			db.User.find({username: current.username}, function(err, user) {
 				if(err) res.json(err);
-				user[0].friendRequests.map( req => {
-					console.log(req);
-					console.log(req.sender);
-					if(req.sender === username) console.log('match match match');
-				});
 
-				// user[0].friendRequests.push(friendReq);
-				// user[0].save(function(err, newUser) {
-				// 	if(err) console.log(err);
-				// 	console.log(newUser);
+				// user[0].friendRequests.map( req => {
+				// 	console.log(req.sender);
+
 				// });
+				console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+				var newRequests = user[0].friendRequests.filter(req => {
+
+					console.log(req);
+					console.log('..');
+					
+					if(req.sender !== username) return req;
+				});
+				console.log(user[0].friendRequests);
+				
+				console.log(newRequests);
+
+
+				user[0].friendRequests = newRequests;
+				console.log(user[0]);
+				user[0].save(function(err, newUser) {
+					if(err) console.log(err);
+					console.log("New Guy", newUser);
+				});
 			});
 		}
 	});

@@ -67,7 +67,7 @@
         $.post(url, function(data) {
           console.log(data);
         }).then(function() {
-
+          getUserData();
         }).catch(function(err) {
 
         });
@@ -182,10 +182,10 @@
           // console.log(x);
         });
 
-        // check 
+        //  
         window.onbeforeunload = userExit;
         function userExit() {
-          socket.emit('exit', user);
+          socket.emit('exit', current_user);
           socket.disconnect();
         }
       });

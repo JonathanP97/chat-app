@@ -32,11 +32,36 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
 
-      // function setUser(username) {
-      //   console.log(username);
-      //   console.log(currentUser);
-      //   current_user.name = username;
-      // }
+      function searchFriends(currentUser) {
+        var name = $('#name-input').val();
+        var url = '/api/users/' + name;
+        results = [];
+        $.get(url, function(data, status) {
+          data.map(user => {
+            var user = {
+              name: user.username,
+              id: user._id
+            }
+            results.push(user);
+          })               
+        }).then( function() {
+          results.map(user => {
+            var d = $("<div id='holder'>");
+            var friendCard = $("<p class='friend'>").text(user.name);
+            d.append(friendCard);
+            
+            if(user.name !== currentUser.name) {
+              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='sendFriendReq()'>").text('add');
+            
+              d.append(btn);
+            }
+            
+            $('#results').append(d);
+          })            
+        }).catch(function(err) {
+          console.log(err);
+        });        
+      }
 
       function sendFriendReq() {
         var request = prompt("Add some text to your friend request", "Let's be friends!");
@@ -78,7 +103,16 @@
       }
 
       function reloadFriends(friends) {
-        // console.log(friends);
+        friends.map((u) => {
+          console.log(u[0]);
+
+          var d = $("<div class='friend_div'>");
+          var friend = $("<p class='friendName'>").text(u[0]);
+          d.append(friend);
+
+          $('#friends').append(d);
+
+        });
       }
 
       function reloadFriendRequests(requests) {
@@ -101,19 +135,18 @@
       }
 
       // queries mongo to update client
-      function getUserData(u) {
+      function getUserData(currentUser) {
         var user = null;
         var url = '/update'; 
 
         $.get(url, function(data, status) {
-          console.log(data);
+          
           user = data;
         }).then( function() {
-          // setUser(user.username);
+          currentUser.name = user.username
           
-          u.name = user.username
-          console.log(u);
           $('#current_user').text(user.username);
+          
           // display messages
           if(user.mail.length !== 0) {
 
@@ -122,8 +155,7 @@
           // display friends
           if(user.friends.length !== 0) {
             $('#friends').empty();
-
-            // reloadFriends(####);
+            reloadFriends(user.friends);
           }
 
           // display friend requests
@@ -139,6 +171,7 @@
 
       }
 
+
       $( function() {
         var socket = io();
         var results = [];
@@ -148,7 +181,6 @@
         };
         
         getUserData(currentUser);
-        
 
         socket.on('connect', () => {
           console.log(socket.id); 
@@ -156,42 +188,8 @@
         
         $('#search-form').submit( function() {  
           event.preventDefault();
-          $('#results').empty();        
-          var name = $('#name-input').val();
-          var url = '/api/users/' + name;
-          results = [];
-          socket.emit('event', socket);
-          $.get(url, function(data, status) {
-            console.log(data)
-            // TODO: send id & username only //
-            data.map(user => {
-              var user = {
-                name: user.username,
-                id: user._id
-              }
-              results.push(user);
-            })               
-          }).then( function() {
-            console.log(currentUser);
-            results.map(user => {
-
-              console.log(user);
-              var d = $("<div id='holder'>");
-              var friendCard = $("<p class='friend'>").text(user.name);
-              d.append(friendCard);
-              
-              if(user.name !== currentUser.name) {
-                var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='sendFriendReq()'>").text('add');
-              
-                d.append(btn);
-              }
-              
-              $('#results').append(d);
-
-            })            
-          }).catch(function(err) {
-            console.log(err);
-          });
+          $('#results').empty();
+          searchFriends(currentUser);
         });
 
 

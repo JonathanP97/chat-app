@@ -52,13 +52,13 @@
       function addFriend() {
         console.log(this.event.target);
         var url = '/accept/' + this.event.target.id;
-        // $.post(url, function(data, status) {
-        //   console.log(data);
-        // }).then( function() {
+        $.post(url, function(data, status) {
+          console.log(data);
+        }).then( function() {
 
-        // }).catch(function(err) {
-        //   console.log(err);
-        // });
+        }).catch(function(err) {
+          console.log(err);
+        });
       }
 
       function ignoreRequest() {

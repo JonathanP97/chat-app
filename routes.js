@@ -98,30 +98,41 @@ module.exports = function(app, passport, io) {
 	// updates user friend list to add friend to friends list
 	// id or username
 	app.post('/accept/:name', function(req, res) {
-		var name = req.params.name
+		var name = req.params.name;
 		console.log('##### in accept route #####');
-		console.log(name);
+		console.log('Sender: ',name);
 
 		if(req.isAuthenticated() && req.user) {
 			var current_user = req.user;
 			var sender = null;
 			console.log(req.user);
-			console.log("\n\n___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\n\n");
 
 			// finding sender of friend request in db
 			db.User.find({username: name}).then(function(user) {
+				console.log(user[0]);
 
-				sender = user[0];
-				sender.friends.push(current_user.username);
-				console.log(user);
-				sender.save(function(err) {
+				user[0].friends.push(current_user.username);
+				
+				console.log(user[0].friends[0]);
+
+				user[0].save(function(err) {
 					if(err) res.json(err);
 				});
+				
+				// sender = user[0];
+				// sender.friends.push(current_user.username);
+				
+				// sender.save(function(err) {
+				// 	if(err) res.json(err);
+				// });
 
-				current_user.friends.push(sender.username);
-				current_user.save(function(err) {
-					if(err) res.json(err);   
-				});W
+				
+
+				// current_user.friends.push(sender.username);
+				
+				// current_user.save(function(err) {
+				// 	if(err) res.json(err);   
+				// });
 			}).catch( function(err) {
 				res.json(err);
 			});

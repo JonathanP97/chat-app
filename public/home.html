@@ -32,10 +32,14 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
 
+      // function setUser(username) {
+      //   console.log(username);
+      //   console.log(currentUser);
+      //   current_user.name = username;
+      // }
+
       function sendFriendReq() {
-        do {
-          var request = prompt("Add some text to your friend request", "Let's be friends!");
-        } while (request == null || request == "");
+        var request = prompt("Add some text to your friend request", "Let's be friends!");
         
         var url = '/request/' + this.event.target.name;
         console.log(url);
@@ -97,7 +101,7 @@
       }
 
       // queries mongo to update client
-      function getUserData() {
+      function getUserData(u) {
         var user = null;
         var url = '/update'; 
 
@@ -105,8 +109,11 @@
           console.log(data);
           user = data;
         }).then( function() {
+          // setUser(user.username);
+          
+          u.name = user.username
+          console.log(u);
           $('#current_user').text(user.username);
-
           // display messages
           if(user.mail.length !== 0) {
 
@@ -124,6 +131,8 @@
             $('#friend_requests').empty();
             reloadFriendRequests(user.friendRequests); 
           }
+
+          
         }).catch( function(err) {
           console.log(err);
         });
@@ -132,13 +141,14 @@
 
       $( function() {
         var socket = io();
-        getUserData();
-
         var results = [];
-        var current_user = {
+        var currentUser = {
           id: "",
           name: ""
         };
+        
+        getUserData(currentUser);
+        
 
         socket.on('connect', () => {
           console.log(socket.id); 
@@ -162,13 +172,20 @@
               results.push(user);
             })               
           }).then( function() {
+            console.log(currentUser);
             results.map(user => {
+
+              console.log(user);
               var d = $("<div id='holder'>");
               var friendCard = $("<p class='friend'>").text(user.name);
-              var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='sendFriendReq()'>").text('add');
-
               d.append(friendCard);
-              d.append(btn)
+              
+              if(user.name !== currentUser.name) {
+                var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='sendFriendReq()'>").text('add');
+              
+                d.append(btn);
+              }
+              
               $('#results').append(d);
 
             })            
@@ -185,7 +202,7 @@
         //  
         window.onbeforeunload = userExit;
         function userExit() {
-          socket.emit('exit', current_user);
+          socket.emit('exit', currentUser);
           socket.disconnect();
         }
       });

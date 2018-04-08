@@ -10,14 +10,14 @@ module.exports = function(app, passport, io) {
 	//   console.log(socket.id);
 	// });
 
-	passport.serializeUser( (id, done) => {
-		console.log('in serialize');
-		done(null, id);
-	});
+	// passport.serializeUser( (id, done) => {
+	// 	console.log('in serialize');
+	// 	done(null, id);
+	// });
 
-	passport.deserializeUser( (id,done) => {
-		done(null, id);
-	});
+	// passport.deserializeUser( (id,done) => {
+	// 	done(null, id);
+	// });
 
 	function authenticationMiddleware () {  
 		return (req, res, next) => {
@@ -32,6 +32,9 @@ module.exports = function(app, passport, io) {
 		res.sendFile(__dirname + '/public/chat.html');
 	});
 
+
+
+	/**************/
 	app.get('/home', authenticationMiddleware(), function(req, res) {
 		console.log('in routes ========================')
 		console.log(req.user);
@@ -46,6 +49,8 @@ module.exports = function(app, passport, io) {
 		  res.sendFile(__dirname + '/public/login.html');
 		}
 	});
+	/***************/
+
 
 
 	app.get('/', function(req, res) {
@@ -61,24 +66,29 @@ module.exports = function(app, passport, io) {
 		});
 	});
 
-	//gets one specific user --> to update client
+	// UPDATES USER (working)
+	// gets data on user to update client 
+	// friend requests, friends and mail
 	app.get('/update', function(req, res) {
 		console.log(req.user.username);
-		if(req.isAuthenticated() && req.user) {
-			
-			db.User.find({username: req.user.username}).then(function(user) {
-				var newUser = {
-					friends: user[0].friends,
-					friendRequests: user[0].friendRequests,
-					mail: user[0].mailbox,
-					username: user[0].username,
-					id: user[0]._id
-				}
 
-				res.json(newUser);
+		if(req.isAuthenticated() && req.user) {
+			//make function
+			db.User.find({username: req.user.username}).then(function(user) {
+			  var newUser = {
+				friends: user[0].friends,
+				friendRequests: user[0].friendRequests,
+				mail: user[0].mailbox,
+				username: user[0].username,
+				id: user[0]._id
+			  }
+
+			  res.json(newUser);
+
 			}).catch(function(err) {
-				res.json(err);
+			  res.json(err);
 			});
+			//
 		}
 	});
 
@@ -99,66 +109,77 @@ module.exports = function(app, passport, io) {
 	// id or username
 	app.post('/accept/:name', function(req, res) {
 		var name = req.params.name;
-		console.log('##### in accept route #####');
-		console.log('Sender: ',name);
+		console.log('^^^^^^^^^^Sender^^^^^^^^^^: ',name);
 
 		if(req.isAuthenticated() && req.user) {
 			var current_user = req.user;
 			var sender = null;
-			console.log(req.user);
+			console.log('##########################');
+			console.log(current_user);
+			current_user.friends.push(name);
+			console.log(current_user);
+
+			
+			db.User.find({username: name}, function(err, user) {
+				console.log(user[0]);
+				if(!user) return res.json(err);
+				else {
+				    user[0].modified = new Date();
+				    user[0].friends.push(current_user.username);				    
+				    user[0].save(function(err) {
+				      if (err)
+				        console.log('error')
+				      else
+				        console.log('success')
+				    	current_user.save(function(err) {
+					      if (err)
+					        console.log('error')
+					      else
+					        console.log('success')				    		
+				    	})
+				    });	
+				}
+			})
+
 
 			// finding sender of friend request in db
-			db.User.find({username: name}).then(function(user) {
-				console.log(user[0]);
+			// db.User.find({username: name}).then(function(user) {
 
-				user[0].friends.push(current_user.username);
-				
-				console.log(user[0].friends[0]);
+			// 	console.log(user[0].username);
+			// 	// user[0].friends.push(current_user.username);
+		
+			// 	// user[0].save(function(err) {
+			// 	// 	if(err) res.json(err);
+			// 	// });
 
-				user[0].save(function(err) {
-					if(err) res.json(err);
-				});
-				
-				// sender = user[0];
-				// sender.friends.push(current_user.username);
-				
-				// sender.save(function(err) {
-				// 	if(err) res.json(err);
-				// });
+			// 	current_user.save(function(err) {
+			// 		if(err) res.json(err);   
+			// 	});
 
-				
-
-				// current_user.friends.push(sender.username);
-				
-				// current_user.save(function(err) {
-				// 	if(err) res.json(err);   
-				// });
-			}).catch( function(err) {
-				res.json(err);
-			});
+			// }).catch( function(err) {
+			// 	res.json(err);
+			// });
 
 		}
 
 	});
 
-	// ADD FRIENDS (working 3/10/18)
+	// Send Friend Requests (working)
 	// updates friend request to recievers inbox
 	app.post('/request/:name', function(req, res) {
 		var reciever_username = req.params.name;
-		console.log('Reciever:', reciever_username);
-		console.log('Request Body:', req.body);
 
 		if(req.isAuthenticated() && req.user) {
 			var sender = req.user;
-			console.log('sender:', sender);
 			var friendReq = {
 				text: req.body.text || 'Let\'s be friends!',
-				sender: sender.username
+				sender: sender.username,
+				date_sent: Date.now()
 			};
 
 			db.User.find({username: reciever_username}, function(err, user) {
 				if(err) res.json(err);
-				console.log(user);
+
 				user[0].friendRequests.push(friendReq);
 				user[0].save(function(err, newUser) {
 					if(err) console.log(err);

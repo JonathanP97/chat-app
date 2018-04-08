@@ -50,6 +50,7 @@
             var friendCard = $("<p class='friend'>").text(user.name);
             d.append(friendCard);
             
+            // todo add function to search currentUser mail for sent requests and block multiple requests
             if(user.name !== currentUser.name) {
               var btn = $("<button id='"+ user.id +"' name='"+ user.name +"' class='addFriend' onclick='sendFriendReq()'>").text('add');
             
@@ -63,19 +64,24 @@
         });        
       }
 
-      function sendFriendReq() {
-        var request = prompt("Add some text to your friend request", "Let's be friends!");
-        
-        var url = '/request/' + this.event.target.name;
-        console.log(url);
-        
-        $.post(url, {text: request},function(data) {
-          console.log(data);
-        }).then( function() {
 
-        }).catch(function(err) {
-          console.log(err);
-        });
+      // not working, prevent multiple requests
+      // Initiates prompt for friend request text
+      // Posts to /request/:name
+      function sendFriendReq() {
+        var request_text = prompt("Add some text to your friend request", "Let's be friends!");
+
+        if(request_text !== null) {
+          var url = '/request/' + this.event.target.name;
+          
+          $.post(url, {text: request_text},function(data) {
+            console.log(data);
+          }).then( function() {
+          }).catch(function(err) {
+            console.log(err);
+          });          
+        }
+
       }
 
       function addFriend() {
@@ -135,12 +141,12 @@
       }
 
       // queries mongo to update client
+      // accepts user
       function getUserData(currentUser) {
         var user = null;
         var url = '/update'; 
 
-        $.get(url, function(data, status) {
-          
+        $.get(url, function(data, status) {  
           user = data;
         }).then( function() {
           currentUser.name = user.username
@@ -197,7 +203,7 @@
           // console.log(x);
         });
 
-        //  
+        // 
         window.onbeforeunload = userExit;
         function userExit() {
           socket.emit('exit', currentUser);
